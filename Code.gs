@@ -42,30 +42,40 @@ ticket[header] = row[index];
 
 //Creating a ticket
 function createTicket(ticketData){
- const sheet = SPREADSHEET.getSheetByName('Tickets');
+  // Backend Validation
+  if (!ticketData.customerName || !ticketData.email || !ticketData.description) {
+    return JSON.stringify({success: false, error: "Missing required fields (Name, Email, or Description)"});
+  }
 
- const ticketId= "TKT-"+ Math.floor(Math.random() * 1000000000);
- const dateCreated = new Date().toISOString();
+  // Basic email regex validation
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!emailRegex.test(ticketData.email)) {
+    return JSON.stringify({success: false, error: "Invalid email format"});
+  }
 
- const rowData = [
-ticketId,
-dateCreated,
-ticketData.customerName || '',
-ticketData.email || '',
-ticketData.phone || '',
-ticketData.orderId || '',
-ticketData.issueTheme || '',
-ticketData.channel || 'Email',
-'Pending',
-ticketData.priority || 'Medium',
-ticketData.assignedTo || 'Unassigned',
-ticketData.description  || '',
-'' 
- ];
+  const sheet = SPREADSHEET.getSheetByName('Tickets');
 
- sheet.appendRow(rowData);
-return JSON.stringify({success:true, id:ticketId});
+  const ticketId= "TKT-"+ Math.floor(Math.random() * 1000000000);
+  const dateCreated = new Date().toISOString();
 
+  const rowData = [
+    ticketId,
+    dateCreated,
+    ticketData.customerName,
+    ticketData.email,
+    ticketData.phone || '',
+    ticketData.orderId || '',
+    ticketData.issueTheme || '',
+    ticketData.channel || 'Email',
+    'Pending',
+    ticketData.priority || 'Medium',
+    ticketData.assignedTo || 'Unassigned',
+    ticketData.description,
+    '' 
+  ];
+
+  sheet.appendRow(rowData);
+  return JSON.stringify({success:true, id:ticketId});
 }
 
 /**
@@ -73,8 +83,11 @@ return JSON.stringify({success:true, id:ticketId});
  * @param {string} ticketId - The ID of the ticket to update.
  * @param {string} newStatus - The new status string.
  */
-
 function updateTicketStatus(ticketId, newStatus) {
+  // Backend Validation
+  if (!ticketId || !newStatus) {
+    return JSON.stringify({error: "Ticket ID and Status are required"});
+  }
 
   const sheet = SPREADSHEET.getSheetByName('Tickets');
 
