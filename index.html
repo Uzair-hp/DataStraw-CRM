@@ -1,0 +1,1220 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <base target="_top">
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Support CRM</title>
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- FontAwesome Icons -->
+    <link
+        rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    >
+
+    <style>
+        /* Custom Scrollbar */
+        .panel-scroll::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .panel-scroll::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+
+        .panel-scroll::-webkit-scrollbar-thumb {
+            background: #c1c1c1;
+            border-radius: 4px;
+        }
+
+        .panel-scroll::-webkit-scrollbar-thumb:hover {
+            background: #a8a8a8;
+        }
+    </style>
+</head>
+
+<body class="bg-gray-100 h-screen overflow-hidden flex flex-col">
+
+    <!-- ================= NAVBAR ================= -->
+    <nav class="bg-blue-800 text-white p-4 shadow-md flex justify-between items-center z-10">
+
+        <div class="text-xl font-bold">
+            <i class="fa-solid fa-headset mr-2"></i>
+            DataStraw Support CRM
+        </div>
+
+        <button
+            onclick="openNewTicketModal()"
+            class="bg-blue-600 hover:bg-blue-500 px-4 py-2 rounded shadow transition"
+        >
+            <i class="fa-solid fa-plus mr-1"></i>
+            New Ticket
+        </button>
+
+    </nav>
+
+    <!-- ================= MAIN LAYOUT ================= -->
+    <div class="flex flex-1 overflow-hidden">
+
+        <!-- ========== LEFT PANEL : TICKET LIST ========== -->
+        <div class="w-1/3 bg-white border-r border-gray-200 flex flex-col">
+
+            <!-- Search & Filters -->
+<div
+    class="p-4 border-b border-gray-200 bg-gray-50 flex flex-col gap-2"
+>
+
+    <!-- Search -->
+    <input
+        type="text"
+        id="searchInput"
+        onkeyup="filterTickets()"
+        placeholder="Search ID, Name, Email, Phone..."
+        class="w-full p-2 text-sm border border-gray-300 rounded focus:outline-none focus:border-blue-500"
+    >
+
+    <!-- Filters -->
+    <div class="flex gap-2">
+
+        <!-- Status Filter -->
+        <select
+            id="statusFilter"
+            onchange="filterTickets()"
+            class="w-1/2 p-1 text-xs border border-gray-300 rounded bg-white"
+        >
+
+            <option value="All">
+                All Statuses
+            </option>
+
+            <option value="Active">
+                Active Only
+            </option>
+
+            <option value="Pending">
+                Pending
+            </option>
+
+            <option value="In Progress">
+                In Progress
+            </option>
+
+            <option value="Resolved">
+                Resolved
+            </option>
+
+        </select>
+
+        <!-- Channel Filter -->
+        <select
+            id="channelFilter"
+            onchange="filterTickets()"
+            class="w-1/2 p-1 text-xs border border-gray-300 rounded bg-white"
+        >
+
+            <option value="All">
+                All Channels
+            </option>
+
+            <option value="Email">
+                Email
+            </option>
+
+            <option value="WhatsApp">
+                WhatsApp
+            </option>
+
+            <option value="Phone Call">
+                Phone Call
+            </option>
+
+        </select>
+
+    </div>
+
+</div>
+          
+
+            <!-- Ticket List -->
+            <div
+                id="ticketListContainer"
+                class="flex-1 overflow-y-auto panel-scroll p-2"
+            >
+
+                <!-- Loading State -->
+                <div class="text-center text-gray-500 mt-10">
+
+                    <i class="fa-solid fa-spinner fa-spin text-2xl mb-2"></i>
+
+                    <p>Loading tickets...</p>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- ========== CENTER PANEL : TICKET DETAILS ========== -->
+        <div class="w-1/3 bg-gray-50 flex flex-col border-r border-gray-200">
+
+            <!-- Ticket Details -->
+            <div
+                id="ticketDetailContainer"
+                class="flex-1 overflow-y-auto panel-scroll p-6 hidden"
+            >
+
+                <h2
+                    class="text-2xl font-bold mb-4"
+                    id="detail-id"
+                >
+                    TKT-XXXXXX
+                </h2>
+
+                <div class="bg-white p-4 rounded shadow-sm mb-4">
+
+                    <p>
+                        <strong>Customer:</strong>
+                        <span id="detail-customer"></span>
+                    </p>
+
+                    <p class="mt-2">
+                        <strong>Status:</strong>
+
+                        <span
+                            id="detail-status"
+                            class="px-2 py-1 text-sm rounded bg-gray-200"
+                        ></span>
+                    </p>
+
+             <p class="mt-4">
+    <strong>Description:</strong>
+</p>
+
+<p
+    id="detail-description"
+    class="text-gray-700 mt-1"
+></p>
+
+<!-- Resolution Notes -->
+<div class="mt-6 border-t border-gray-200 pt-4">
+
+    <label class="block text-sm font-semibold mb-2">
+
+        Resolution & Internal Notes:
+
+    </label>
+
+    <textarea
+        id="detail-notes"
+        rows="3"
+        class="w-full p-2 border border-gray-300 rounded focus:border-blue-500 outline-none"
+        placeholder="Type internal notes or resolution steps here..."
+    ></textarea>
+
+</div>
+</div>
+<!-- Action Buttons -->
+<div class="flex gap-2 mt-4">
+
+    <button
+        id="updateBtn"
+        class="bg-green-600 hover:bg-green-500 text-white px-4 py-2 rounded shadow"
+    >
+
+        Update Status
+
+    </button>
+
+    <button
+        id="saveNotesBtn"
+        class="bg-blue-600 hover:bg-blue-500 text-white px-4 py-2 rounded shadow"
+    >
+
+        Save Notes
+
+    </button>
+
+</div>      
+
+            </div>
+
+            <!-- Empty State -->
+            <div
+                id="noTicketSelected"
+                class="flex-1 flex flex-col items-center justify-center text-gray-400"
+            >
+
+                <i class="fa-solid fa-ticket text-6xl mb-4 text-gray-300"></i>
+
+                <p class="text-lg">
+                    Select a ticket to view details
+                </p>
+
+            </div>
+
+        </div>
+
+        <!-- ========== RIGHT PANEL : INSIGHTS ========== -->
+        <div class="w-1/3 bg-white flex flex-col">
+
+            <!-- Header -->
+            <div class="p-4 border-b border-gray-200 bg-gray-50 font-semibold">
+
+                Insights & Order Data
+
+            </div>
+
+            <!-- Insights Container -->
+            <div
+                id="insightsContainer"
+                class="flex-1 overflow-y-auto panel-scroll p-4 hidden"
+            >
+
+                <!-- Dynamic Insights Here -->
+
+            </div>
+
+            <!-- Empty State -->
+            <div
+                id="noInsights"
+                class="flex-1 flex flex-col items-center justify-center text-gray-400"
+            >
+
+                <i class="fa-solid fa-chart-pie text-6xl mb-4 text-gray-300"></i>
+
+                <p>Select a ticket to view insights</p>
+
+            </div>
+
+        </div>
+
+    </div>
+<!-- New Ticket Modal -->
+<div
+    id="newTicketModal"
+    class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
+>
+
+    <div class="bg-white rounded-lg shadow-xl w-full max-w-2xl flex flex-col">
+
+        <!-- Modal Header -->
+        <div
+            class="p-4 border-b border-gray-200 flex justify-between items-center bg-gray-50 rounded-t-lg"
+        >
+
+            <h3 class="text-xl font-bold">
+                Create New Ticket
+            </h3>
+
+            <button
+                onclick="closeModal()"
+                class="text-gray-500 hover:text-red-500 transition"
+            >
+                <i class="fa-solid fa-times text-xl"></i>
+            </button>
+
+        </div>
+
+        <!-- Modal Body -->
+        <div
+            class="p-6 flex-1 overflow-y-auto max-h-[70vh] panel-scroll"
+        >
+
+            <form
+                id="newTicketForm"
+                onsubmit="submitNewTicket(event)"
+            >
+
+                <!-- Customer Details -->
+                <div class="grid grid-cols-2 gap-4 mb-4">
+
+                    <div>
+
+                        <label class="block text-sm font-semibold mb-1">
+                            Customer Name *
+                        </label>
+
+                        <input
+                            type="text"
+                            id="customerName"
+                            required
+                            class="w-full p-2 border border-gray-300 rounded focus:border-blue-500 outline-none"
+                        >
+
+                    </div>
+
+                    <div>
+
+                        <label class="block text-sm font-semibold mb-1">
+                            Email *
+                        </label>
+
+                        <input
+                            type="email"
+                            id="email"
+                            required
+                            class="w-full p-2 border border-gray-300 rounded focus:border-blue-500 outline-none"
+                        >
+
+                    </div>
+
+                    <div>
+
+                        <label class="block text-sm font-semibold mb-1">
+                            Phone
+                        </label>
+
+                        <input
+                            type="text"
+                            id="phone"
+                            class="w-full p-2 border border-gray-300 rounded focus:border-blue-500 outline-none"
+                        >
+
+                    </div>
+
+                    <div>
+
+                        <label class="block text-sm font-semibold mb-1">
+                            Order ID (Optional)
+                        </label>
+
+                        <input
+                            type="text"
+                            id="orderId"
+                            class="w-full p-2 border border-gray-300 rounded focus:border-blue-500 outline-none"
+                        >
+
+                    </div>
+
+                </div>
+
+                <!-- Ticket Info -->
+                <div class="grid grid-cols-2 gap-4 mb-4">
+
+                    <div>
+
+                        <label class="block text-sm font-semibold mb-1">
+                            Issue Theme *
+                        </label>
+
+                        <select
+                            id="issueTheme"
+                            required
+                            class="w-full p-2 border border-gray-300 rounded focus:border-blue-500 outline-none bg-white"
+                        >
+
+                            <option value="">
+                                Select Theme
+                            </option>
+
+                            <option value="Billing">
+                                Billing
+                            </option>
+
+                            <option value="Delivery">
+                                Delivery / Shipping
+                            </option>
+
+                            <option value="Defect">
+                                Product Defect
+                            </option>
+
+                            <option value="General Inquiry">
+                                General Inquiry
+                            </option>
+
+                        </select>
+
+                    </div>
+
+                    <div>
+
+                        <label class="block text-sm font-semibold mb-1">
+                            Channel *
+                        </label>
+
+                        <select
+                            id="channel"
+                            required
+                            class="w-full p-2 border border-gray-300 rounded focus:border-blue-500 outline-none bg-white"
+                        >
+
+                            <option value="Email">
+                                Email
+                            </option>
+
+                            <option value="WhatsApp">
+                                WhatsApp
+                            </option>
+
+                            <option value="Phone Call">
+                                Phone Call
+                            </option>
+
+                        </select>
+
+                    </div>
+
+                </div>
+
+                <!-- Description -->
+                <div class="mb-4">
+
+                    <label class="block text-sm font-semibold mb-1">
+                        Description *
+                    </label>
+
+                    <textarea
+                        id="description"
+                        required
+                        rows="4"
+                        class="w-full p-2 border border-gray-300 rounded focus:border-blue-500 outline-none"
+                    ></textarea>
+
+                </div>
+
+                <!-- Buttons -->
+                <div class="flex justify-end gap-2 mt-6">
+
+                    <button
+                        type="button"
+                        onclick="closeModal()"
+                        class="px-4 py-2 border border-gray-300 rounded text-gray-700 hover:bg-gray-50"
+                    >
+                        Cancel
+                    </button>
+
+                    <button
+                        type="submit"
+                        id="submitBtn"
+                        class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+                    >
+                        Create Ticket
+                    </button>
+
+                </div>
+
+            </form>
+
+        </div>
+
+    </div>
+
+</div>
+    <!-- ================= SCRIPT ================= -->
+   <script>
+
+    // Global ticket storage
+    let allTickets = [];
+
+    // Load tickets on page load
+    document.addEventListener(
+        "DOMContentLoaded",
+        loadTickets
+    );
+
+    function loadTickets() {
+
+        google.script.run
+            .withSuccessHandler(renderTicketList)
+            .withFailureHandler(handleError)
+            .getTickets();
+
+    }
+
+    // Render ticket list
+   function renderTicketList(jsonString) {
+
+    try {
+
+        allTickets = JSON.parse(jsonString);
+
+        // Draw tickets
+        displayTickets(allTickets);
+
+    } catch (e) {
+
+        handleError(
+            "Error parsing data: " + e.message
+        );
+
+    }
+
+}
+
+// Draw tickets to screen
+function displayTickets(ticketsToDisplay) {
+
+    const container =
+        document.getElementById('ticketListContainer');
+
+    if (ticketsToDisplay.length === 0) {
+
+        container.innerHTML = `
+            <div class="p-4 text-center text-gray-500">
+
+                No tickets match your search.
+
+            </div>
+        `;
+
+        return;
+
+    }
+
+    let html = '';
+
+    ticketsToDisplay.forEach(ticket => {
+
+        let statusColor =
+            "bg-gray-200 text-gray-800";
+
+        if (ticket.Status === 'Pending') {
+
+            statusColor =
+                "bg-yellow-200 text-yellow-800";
+
+        }
+
+        if (ticket.Status === 'In Progress') {
+
+            statusColor =
+                "bg-blue-200 text-blue-800";
+
+        }
+
+        if (ticket.Status === 'Waiting on Customer') {
+
+            statusColor =
+                "bg-orange-200 text-orange-800";
+
+        }
+
+        if (ticket.Status === 'Resolved') {
+
+            statusColor =
+                "bg-green-200 text-green-800";
+
+        }
+
+        html += `
+
+            <div
+                class="p-3 mb-2 bg-white border border-gray-200 rounded shadow-sm hover:shadow-md cursor-pointer transition"
+                onclick="viewTicket('${ticket.TicketID}')"
+            >
+
+                <div class="flex justify-between items-start mb-1">
+
+                    <span class="font-bold text-blue-800">
+                        ${ticket.TicketID}
+                    </span>
+
+                    <span class="text-xs px-2 py-1 rounded-full ${statusColor}">
+                        ${ticket.Status}
+                    </span>
+
+                </div>
+
+                <div class="text-sm font-semibold text-gray-800">
+                    ${ticket.CustomerName}
+                </div>
+
+                <div class="text-xs text-gray-500 truncate">
+                    ${ticket.Channel || 'Email'} | ${ticket.IssueTheme}
+                </div>
+
+            </div>
+
+        `;
+
+    });
+
+    container.innerHTML = html;
+
+}
+
+// Filter tickets
+function filterTickets() {
+
+    const searchTerm =
+        document.getElementById('searchInput')
+        .value
+        .toLowerCase();
+
+    const statusFilter =
+        document.getElementById('statusFilter').value;
+
+    const channelFilter =
+        document.getElementById('channelFilter').value;
+
+    const filtered = allTickets.filter(ticket => {
+
+        // Search match
+        const matchesSearch =
+
+            (ticket.TicketID &&
+                ticket.TicketID
+                    .toLowerCase()
+                    .includes(searchTerm))
+
+            ||
+
+            (ticket.CustomerName &&
+                ticket.CustomerName
+                    .toLowerCase()
+                    .includes(searchTerm))
+
+            ||
+
+            (ticket.Email &&
+                ticket.Email
+                    .toLowerCase()
+                    .includes(searchTerm))
+
+            ||
+
+            (ticket.Phone &&
+                ticket.Phone
+                    .toString()
+                    .includes(searchTerm))
+
+            ||
+
+            (ticket.OrderID &&
+                ticket.OrderID
+                    .toString()
+                    .toLowerCase()
+                    .includes(searchTerm));
+
+        // Status filter
+        let matchesStatus = true;
+
+        if (statusFilter === 'Active') {
+
+            matchesStatus =
+                (ticket.Status !== 'Resolved');
+
+        } else if (statusFilter !== 'All') {
+
+            matchesStatus =
+                (ticket.Status === statusFilter);
+
+        }
+
+        // Channel filter
+        let matchesChannel = true;
+
+        if (channelFilter !== 'All') {
+
+            matchesChannel =
+                (ticket.Channel === channelFilter);
+
+        }
+
+        return (
+            matchesSearch &&
+            matchesStatus &&
+            matchesChannel
+        );
+
+    });
+
+    displayTickets(filtered);
+
+}
+
+    // Show selected ticket details
+    let currentlySelectedTicketId = null;
+
+    function viewTicket(ticketId) {
+
+        currentlySelectedTicketId = ticketId;
+
+        const ticket = allTickets.find(
+            t => t.TicketID === ticketId
+        );
+
+        if (!ticket) return;
+
+        document
+            .getElementById('noTicketSelected')
+            .classList.add('hidden');
+
+        document
+            .getElementById('ticketDetailContainer')
+            .classList.remove('hidden');
+
+        document.getElementById('detail-id').innerText =
+            ticket.TicketID;
+
+        document.getElementById('detail-customer').innerText =
+            `${ticket.CustomerName} (${ticket.Email})`;
+
+        // Status Dropdown
+        const statusContainer =
+            document.getElementById('detail-status');
+
+        statusContainer.innerHTML = `
+            <select
+                id="updateStatusSelect"
+                class="border border-gray-300 rounded p-1 text-sm bg-white"
+            >
+
+                <option
+                    value="Pending"
+                    ${ticket.Status === 'Pending' ? 'selected' : ''}
+                >
+                    Pending
+                </option>
+
+                <option
+                    value="In Progress"
+                    ${ticket.Status === 'In Progress' ? 'selected' : ''}
+                >
+                    In Progress
+                </option>
+
+                <option
+                    value="Waiting on Customer"
+                    ${ticket.Status === 'Waiting on Customer' ? 'selected' : ''}
+                >
+                    Waiting on Customer
+                </option>
+
+                <option
+                    value="Waiting on Third Party"
+                    ${ticket.Status === 'Waiting on Third Party' ? 'selected' : ''}
+                >
+                    Waiting on Third Party
+                </option>
+
+                <option
+                    value="Resolved"
+                    ${ticket.Status === 'Resolved' ? 'selected' : ''}
+                >
+                    Resolved
+                </option>
+
+            </select>
+        `;
+
+        document.getElementById('detail-description').innerText =
+            ticket.Description || 'No description provided.';
+
+        document.getElementById('detail-notes').value =
+     ticket.ResolutionNotes || '';
+
+        // Update Button Logic
+        const updateBtn =
+            document.getElementById('updateBtn');
+
+        const newUpdateBtn =
+            updateBtn.cloneNode(true);
+
+        updateBtn.parentNode.replaceChild(
+            newUpdateBtn,
+            updateBtn
+        );
+
+
+        newUpdateBtn.addEventListener('click', () => {
+
+            const newStatus =
+                document.getElementById('updateStatusSelect').value;
+
+            saveStatusUpdate(
+                ticketId,
+                newStatus,
+                newUpdateBtn
+            );
+
+        });
+
+        const notesBtn =
+    document.getElementById('saveNotesBtn');
+
+const newNotesBtn =
+    notesBtn.cloneNode(true);
+
+notesBtn.parentNode.replaceChild(
+    newNotesBtn,
+    notesBtn
+);
+
+newNotesBtn.addEventListener('click', () => {
+
+    const notesText =
+        document.getElementById('detail-notes')
+        .value;
+
+    saveNotes(
+        ticketId,
+        notesText,
+        newNotesBtn
+    );
+
+});
+        const insightsContainer =
+    document.getElementById('insightsContainer');
+
+const noInsights =
+    document.getElementById('noInsights');
+
+// Show loading state
+noInsights.classList.add('hidden');
+
+insightsContainer.classList.remove('hidden');
+
+insightsContainer.innerHTML = `
+    <div class="text-center text-gray-500 mt-4">
+
+        <i class="fa-solid fa-spinner fa-spin"></i>
+        Loading order data...
+
+    </div>
+`;
+
+// Check if ticket has Order ID
+const orderId = ticket.OrderID;
+
+if (!orderId || orderId.trim() === "") {
+
+    insightsContainer.innerHTML = `
+        <div class="p-4 bg-gray-100 rounded text-center text-gray-600">
+
+            No Order ID associated with this ticket.
+
+        </div>
+    `;
+
+    return;
+
+}
+
+// Fetch order data
+google.script.run
+
+    .withSuccessHandler((response) => {
+
+        const res = JSON.parse(response);
+
+        if (res.success) {
+
+            const order = res.data;
+
+            insightsContainer.innerHTML = `
+
+                <div class="bg-blue-50 border border-blue-100 p-4 rounded shadow-sm mb-4">
+
+                    <h3 class="font-bold text-blue-800 border-b border-blue-200 pb-2 mb-2">
+
+                        Order Details: ${order.OrderID}
+
+                    </h3>
+
+                    <p class="mb-1">
+
+                        <span class="font-semibold">
+                            Product:
+                        </span>
+
+                        ${order.ProductName}
+
+                    </p>
+
+                    <p class="mb-1">
+
+                        <span class="font-semibold">
+                            Date:
+                        </span>
+
+                        ${new Date(order.OrderDate).toLocaleDateString()}
+
+                    </p>
+
+                    <p class="mb-1">
+
+                        <span class="font-semibold">
+                            Amount:
+                        </span>
+
+                        ${order.Amount}
+
+                    </p>
+
+                    <p class="mt-2">
+
+                        <span class="px-2 py-1 bg-blue-200 text-blue-800 text-xs font-bold rounded">
+
+                            ${order.ShippingStatus}
+
+                        </span>
+
+                    </p>
+
+                </div>
+
+            `;
+
+        } else {
+
+            insightsContainer.innerHTML = `
+                <div class="p-4 bg-red-50 text-red-600 rounded border border-red-200">
+
+                    ${res.error}
+
+                </div>
+            `;
+
+        }
+
+    })
+
+    .withFailureHandler((error) => {
+
+        insightsContainer.innerHTML = `
+            <div class="text-red-500">
+
+                Error loading insights.
+
+            </div>
+        `;
+
+    })
+
+    .getOrderDetails(orderId);
+
+    }
+
+    // Save Status Update
+    function saveStatusUpdate(ticketId, newStatus, btnElement) {
+
+        btnElement.disabled = true;
+        btnElement.innerText = "Updating...";
+
+        google.script.run
+
+            .withSuccessHandler((response) => {
+
+                const res = JSON.parse(response);
+
+                if (res.success) {
+
+                    btnElement.innerText = "Updated!";
+
+                    setTimeout(() => {
+
+                        btnElement.disabled = false;
+                        btnElement.innerText = "Update Status";
+
+                    }, 2000);
+
+                    loadTickets();
+
+                } else {
+
+                    alert(res.error);
+
+                    btnElement.disabled = false;
+                    btnElement.innerText = "Update Status";
+
+                }
+
+            })
+
+            .withFailureHandler((error) => {
+
+                alert("Failed: " + error.message);
+
+                btnElement.disabled = false;
+                btnElement.innerText = "Update Status";
+
+            })
+
+            .updateTicketStatus(ticketId, newStatus);
+
+    }
+
+    function saveNotes(
+    ticketId,
+    notesText,
+    btnElement
+) {
+
+    btnElement.disabled = true;
+
+    btnElement.innerText = "Saving...";
+
+    google.script.run
+
+        .withSuccessHandler((response) => {
+
+            const res =
+                JSON.parse(response);
+
+            if (res.success) {
+
+                btnElement.innerText = "Saved!";
+
+                setTimeout(() => {
+
+                    btnElement.disabled = false;
+
+                    btnElement.innerText =
+                        "Save Notes";
+
+                }, 2000);
+
+                loadTickets();
+
+            } else {
+
+                alert(res.error);
+
+                btnElement.disabled = false;
+
+                btnElement.innerText =
+                    "Save Notes";
+
+            }
+
+        })
+
+        .withFailureHandler((error) => {
+
+            alert(
+                "Failed: " + error.message
+            );
+
+            btnElement.disabled = false;
+
+            btnElement.innerText =
+                "Save Notes";
+
+        })
+
+        .updateTicketNotes(
+            ticketId,
+            notesText
+        );
+
+}
+
+    // Modal Controls
+    function openNewTicketModal() {
+
+        document
+            .getElementById('newTicketModal')
+            .classList.remove('hidden');
+
+    }
+
+    function closeModal() {
+
+        document
+            .getElementById('newTicketModal')
+            .classList.add('hidden');
+
+        document
+            .getElementById('newTicketForm')
+            .reset();
+
+    }
+
+    // Submit New Ticket
+    function submitNewTicket(event) {
+
+        event.preventDefault();
+
+        const submitBtn =
+            document.getElementById('submitBtn');
+
+        submitBtn.disabled = true;
+        submitBtn.innerText = "Saving...";
+
+        const ticketData = {
+
+            customerName:
+                document.getElementById('customerName').value,
+
+            email:
+                document.getElementById('email').value,
+
+            phone:
+                document.getElementById('phone').value,
+
+            orderId:
+                document.getElementById('orderId').value,
+
+            issueTheme:
+                document.getElementById('issueTheme').value,
+
+            channel:
+                document.getElementById('channel').value,
+
+            description:
+                document.getElementById('description').value,
+
+            priority: "Medium"
+
+        };
+
+        google.script.run
+
+            .withSuccessHandler((response) => {
+
+                closeModal();
+
+                submitBtn.disabled = false;
+                submitBtn.innerText = "Create Ticket";
+
+                loadTickets();
+
+            })
+
+            .withFailureHandler((error) => {
+
+                alert(
+                    "Error saving ticket: " + error.message
+                );
+
+                submitBtn.disabled = false;
+                submitBtn.innerText = "Create Ticket";
+
+            })
+
+            .createTicket(ticketData);
+
+    }
+
+    // Error Handler
+    function handleError(error) {
+
+        console.error(error);
+
+        document.getElementById(
+            'ticketListContainer'
+        ).innerHTML = `
+            <div class="p-4 text-center text-red-500">
+
+                <i class="fa-solid fa-triangle-exclamation mb-2"></i>
+                <br>
+
+                Error loading data. Check console.
+
+            </div>
+        `;
+
+    }
+
+</script>
+</body>
+
+</html>
