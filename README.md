@@ -3,7 +3,7 @@
 A fully functional, web-based customer support management system built for the DataStraw AI + Tech Intern Assessment. This system handles support tickets, customer data, and order information with real-time synchronization to Google Sheets.
 
 ## 🚀 Live Demo
-**[Insert Your Deployed Web App URL Here]**
+**https://script.google.com/macros/s/AKfycbwlSJd3XlRt1dLH0oJXEf32adLwxnhEKiIfzlbxfHA5DMdwlCxCUP3j3mykmVXgB5xtJg/exec**
 
 ---
 
